@@ -106,10 +106,10 @@ class CPU
 
     public function run(): void
     {
-        $this->screen->clear();
+        $this->screen?->clear();
 
         while (true) {
-            $this->gamepad->read();
+            $this->gamepad?->read();
 
             if ($this->halted === false) {
                 $this->tick();
@@ -151,7 +151,7 @@ class CPU
 //                break;
 //
             case Opcodes::CLS_00E0:
-                $this->screen->clear();
+                $this->screen?->clear();
                 $draw = true;
                 break;
 
@@ -282,9 +282,10 @@ class CPU
                         $mask = 0b1000_0000 >> $i;
 
                         if (($byte & $mask) !== 0) {
-                            $x = ($regX + $i) % $this->screen::DISPLAY_WIDTH;
-                            $y = ($regY + $b) % $this->screen::DISPLAY_HEIGHT;
-                            $value = $this->screen->togglePixel($x, $y);
+                            [$width, $height] = $this->screen?->resolution() ?? [64, 32];
+                            $x = ($regX + $i) % $width;
+                            $y = ($regY + $b) % $height;
+                            $value = $this->screen?->togglePixel($x, $y);
                             $carry = $carry || !$value;
                         }
                     }
@@ -373,13 +374,13 @@ class CPU
 
         if ($this->soundTimer > 0) {
             if ($this->soundTimer === 1) {
-                $this->audio->beep();
+                $this->audio?->beep();
             }
             --$this->soundTimer;
         }
 
         if ($draw) {
-            $this->screen->draw();
+            $this->screen?->draw();
         }
     }
 }

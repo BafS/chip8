@@ -20,4 +20,9 @@ interface DisplayInterface
      * Clear display.
      */
     public function clear(): void;
+
+    /**
+     * @return array{int, int} [width, height] resolution
+     */
+    public function resolution(): array;
 }

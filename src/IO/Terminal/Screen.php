@@ -9,8 +9,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class Screen implements DisplayInterface, AudioInterface
 {
-    public const DISPLAY_WIDTH = 64;
-    public const DISPLAY_HEIGHT = 32;
+    private const DISPLAY_WIDTH = 64;
+    private const DISPLAY_HEIGHT = 32;
     private const PIXEL_ON = '█';
     private const PIXEL_OFF = ' ';
 
@@ -70,5 +70,10 @@ final class Screen implements DisplayInterface, AudioInterface
     {
         $this->reset();
         $this->cursor->clearScreen();
+    }
+
+    public function resolution(): array
+    {
+        return [self::DISPLAY_WIDTH, self::DISPLAY_HEIGHT];
     }
 }
