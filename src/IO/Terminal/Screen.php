@@ -16,11 +16,11 @@ final class Screen implements DisplayInterface, AudioInterface
 
     private const ASCII_BEL = "\x07";
 
-    private ?string $color;
-    private Cursor $cursor;
+    private readonly ?string $color;
+    private readonly Cursor $cursor;
     private \SplFixedArray $frameBuffer;
 
-    public function __construct(private OutputInterface $output, array $options = [])
+    public function __construct(private readonly OutputInterface $output, array $options = [])
     {
         $this->color = $options['color'] ?? null;
         $this->cursor = $options['cursor'] ?? new Cursor($this->output);
