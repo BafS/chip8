@@ -64,7 +64,7 @@ class CPU
         unset($options['frequency'], $options['debug_callback']);
         $this->quirks = array_merge([
             'shift_quirks' => false,
-        ], $options ?? []);
+        ], $options);
         $this->disassembler = new Disassembler();
 
         $this->reset();
@@ -83,8 +83,8 @@ class CPU
         $this->pc = self::PC_START_ADDR;
         $this->stack = new SplFixedArray(16);
 
-        // 0-80 reserved for font set
-        for ($i = 0; $i < 5 * 16; ++$i) {
+        // 0-80 (0 to 5 * 16) reserved for font set
+        for ($i = 0; $i < 80; ++$i) {
             $this->memory[$i] = self::FONTS[$i];
         }
     }

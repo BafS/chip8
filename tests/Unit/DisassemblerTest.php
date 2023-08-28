@@ -4,12 +4,12 @@ namespace Test\Unit;
 
 use BafS\Chip8\Disassembler;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-final class DisassemblerTest extends \PHPUnit\Framework\TestCase
+final class DisassemblerTest extends TestCase
 {
-    /**
-     * @dataProvider opcodePatternData
-     */
+    #[DataProvider('opcodePatternData')]
     public function testOpcodePatterns(int $opcode, string $pattern): void
     {
         $disassembler = new Disassembler();
@@ -17,7 +17,7 @@ final class DisassemblerTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($pattern, $disassembler->disassemble($opcode)['pattern']);
     }
 
-    public function opcodePatternData(): iterable
+    public static function opcodePatternData(): iterable
     {
         yield '0x00e0' => [0x00e0, '00E0'];
         yield '0x00ee' => [0x00ee, '00EE'];
@@ -43,9 +43,7 @@ final class DisassemblerTest extends \PHPUnit\Framework\TestCase
         yield '0xff55' => [0xff55, 'FX55'];
     }
 
-    /**
-     * @dataProvider opcodeArgsData
-     */
+    #[DataProvider('opcodeArgsData')]
     public function testOpcodeArgs(int $opcode, array $args): void
     {
         $disassembler = new Disassembler();
@@ -55,7 +53,7 @@ final class DisassemblerTest extends \PHPUnit\Framework\TestCase
         Assert::assertEquals($args, $argsDis);
     }
 
-    public function opcodeArgsData(): iterable
+    public static function opcodeArgsData(): iterable
     {
         yield '0x00e0' => [0x00e0, []];
         yield '0x00ee' => [0x00ee, []];

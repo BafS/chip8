@@ -5,9 +5,10 @@ namespace Test\Unit;
 use BafS\Chip8\CPU;
 use BafS\Chip8\IO\Terminal\Screen;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-final class CPUTest extends \PHPUnit\Framework\TestCase
+final class CPUTest extends TestCase
 {
     /**
      * @return array{0:CPU, 1:Screen}
