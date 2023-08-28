@@ -5,6 +5,8 @@ namespace BafS\Chip8\IO;
 interface DisplayInterface
 {
     /**
+     * Toggle ON or OFF a given pixel.
+     *
      * @return bool Return true if there is a collision
      */
     public function togglePixel(int $x, int $y): bool;

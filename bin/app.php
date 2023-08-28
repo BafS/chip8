@@ -107,7 +107,7 @@ final class Chip8Command
         return (new SingleCommandApplication())
             ->addArgument('file', InputArgument::OPTIONAL, 'The rom')
             ->addOption('frequency', 'f', InputOption::VALUE_REQUIRED)
-            ->setCode(\Closure::fromCallable([$this, 'execute']))
+            ->setCode($this->execute(...))
             ->run();
     }
 }

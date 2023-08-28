@@ -34,7 +34,8 @@ class CPU
         0xF0, 0x80, 0xF0, 0x80, 0x80, // F
     ];
 
-    private int $frequency;
+    /** @var int<1, max> */
+    private readonly int $frequency;
     /** 0x000-0x1FF is reserved */
     private int $pc;
     /** Index register (16-bit register) */
@@ -54,12 +55,16 @@ class CPU
     private bool $halted = false;
 
     public function __construct(
-        private ?DisplayInterface $screen = null,
-        private ?AudioInterface $audio = null,
-        private ?GamepadInterface $gamepad = null,
+        private readonly ?DisplayInterface $screen = null,
+        private readonly ?AudioInterface $audio = null,
+        private readonly ?GamepadInterface $gamepad = null,
         array $options = [],
     ) {
-        $this->frequency = $options['frequency'] ?? 300;
+        $frequency = $options['frequency'] ?? 300;
+        if ($frequency <= 0) {
+            throw new \InvalidArgumentException('Frequency must be bigger than zero.');
+        }
+        $this->frequency = $frequency;
         $this->debugCallback = ($options['debug_callback'] ?? null)?->bindTo($this, $this);
         unset($options['frequency'], $options['debug_callback']);
         $this->quirks = array_merge([
@@ -83,7 +88,7 @@ class CPU
         $this->pc = self::PC_START_ADDR;
         $this->stack = new SplFixedArray(16);
 
-        // 0-80 (0 to 5 * 16) reserved for font set
+        // 0-80 (5 * 16) reserved for font set
         for ($i = 0; $i < 80; ++$i) {
             $this->memory[$i] = self::FONTS[$i];
         }
@@ -147,84 +152,84 @@ class CPU
         $draw = false;
 
         switch ($pattern) {
-//            case Opcodes::SYS_NNN:
+//            case Opcodes::SYS_NNN->value:
 //                break;
 //
-            case Opcodes::CLS_00E0:
+            case Opcodes::CLS_00E0->value:
                 $this->screen?->clear();
                 $draw = true;
                 break;
 
-            case Opcodes::RET_00EE:
+            case Opcodes::RET_00EE->value:
                 $this->pc = $this->stack[$this->sp];
                 $this->sp--;
                 break;
 
-            case Opcodes::JP_1NNN:
+            case Opcodes::JP_1NNN->value:
                 $this->pc = $args['N'];
                 break;
 
-            case Opcodes::CALL_2NNN:
+            case Opcodes::CALL_2NNN->value:
                 $this->sp++;
                 $this->stack[$this->sp] = $this->pc;
                 $this->pc = $args['N'];
                 break;
 
-            case Opcodes::SE_3XNN:
+            case Opcodes::SE_3XNN->value:
                 if ($this->registers[$args['X']] === $args['N']) {
                     $this->pc += 2; // we skip one instruction
                 }
                 break;
 
-            case Opcodes::SNE_4XNN:
+            case Opcodes::SNE_4XNN->value:
                 if ($this->registers[$args['X']] !== $args['N']) {
                     $this->pc += 2;
                 }
                 break;
 
-            case Opcodes::SE_5XY0:
+            case Opcodes::SE_5XY0->value:
                 if ($this->registers[$args['X']] === $this->registers[$args['Y']]) {
                     $this->pc += 2;
                 }
                 break;
 
-            case Opcodes::LD_6XNN:
+            case Opcodes::LD_6XNN->value:
                 $this->setRegister($args['X'], $args['N']);
                 break;
 
-            case Opcodes::ADD_7XNN:
+            case Opcodes::ADD_7XNN->value:
                 $sum = $this->registers[$args['X']] + $args['N'];
                 $this->setRegister($args['X'], $sum & 0xff);
                 break;
 
-            case Opcodes::LD_8XY0:
+            case Opcodes::LD_8XY0->value:
                 $this->setRegister($args['X'], $this->registers[$args['Y']]);
                 break;
 
-            case Opcodes::OR_8XY1:
+            case Opcodes::OR_8XY1->value:
                 $this->setRegister($args['X'], $this->registers[$args['X']] | $this->registers[$args['Y']]);
                 break;
 
-            case Opcodes::AND_8XY2:
+            case Opcodes::AND_8XY2->value:
                 $this->setRegister($args['X'], $this->registers[$args['X']] & $this->registers[$args['Y']]);
                 break;
 
-            case Opcodes::XOR_8XY3:
+            case Opcodes::XOR_8XY3->value:
                 $this->setRegister($args['X'], $this->registers[$args['X']] ^ $this->registers[$args['Y']]);
                 break;
 
-            case Opcodes::ADD_8XY4:
+            case Opcodes::ADD_8XY4->value:
                 $sum = $this->registers[$args['X']] + $this->registers[$args['Y']];
                 $this->setRegister(0xf, $sum > 0xff ? 1 : 0);
                 $this->setRegister($args['X'], $sum & 0xff);
                 break;
 
-            case Opcodes::SUB_8XY5:
+            case Opcodes::SUB_8XY5->value:
                 $this->registers[0xf] = $this->registers[$args['X']] > $this->registers[$args['Y']] ? 1 : 0;
                 $this->setRegister($args['X'], ($this->registers[$args['X']] - $this->registers[$args['Y']]) & 0xff);
                 break;
 
-            case Opcodes::SHR_8XY6:
+            case Opcodes::SHR_8XY6->value:
                 if (!$this->quirks['shift_quirks']) {
                     $args['Y'] = $args['X'];
                 }
@@ -233,7 +238,7 @@ class CPU
                 $this->setRegister($args['X'], $this->registers[$args['X']] >> 1);
                 break;
 
-            case Opcodes::SUBN_8XY7:
+            case Opcodes::SUBN_8XY7->value:
                 $this->registers[0xF] = $this->registers[$args['Y']] > $this->registers[$args['X']] ? 1 : 0;
 
                 $this->setRegister($args['X'], $this->registers[$args['Y']] - $this->registers[$args['X']]);
@@ -243,7 +248,7 @@ class CPU
                 }
                 break;
 
-            case Opcodes::SHL_8XYE:
+            case Opcodes::SHL_8XYE->value:
                 if (!$this->quirks['shift_quirks']) {
                     $args['Y'] = $args['X'];
                 }
@@ -252,25 +257,25 @@ class CPU
                 $this->setRegister($args['X'], ($this->registers[$args['X']] << 1) & 0xff);
                 break;
 
-            case Opcodes::SNE_9XY0:
+            case Opcodes::SNE_9XY0->value:
                 if ($this->registers[$args['X']] !== $this->registers[$args['Y']]) {
                     $this->pc += 2;
                 }
                 break;
 
-            case Opcodes::LD_ANNN:
+            case Opcodes::LD_ANNN->value:
                 $this->i = $args['N'];
                 break;
 
-            case Opcodes::JP_BNNN:
+            case Opcodes::JP_BNNN->value:
                 $this->pc = ($args['N'] + $this->registers[0]) & 0xfff;
                 break;
 
-            case Opcodes::RND_CXNN:
+            case Opcodes::RND_CXNN->value:
                 $this->setRegister($args['X'],  rand(0, 255) & $args['N']);
                 break;
 
-            case Opcodes::DRW_DXYN:
+            case Opcodes::DRW_DXYN->value:
                 $regX = $this->registers[$args['X']];
                 $regY = $this->registers[$args['Y']];
                 $n = $args['N'];
@@ -295,23 +300,23 @@ class CPU
                 $draw = true;
                 break;
 
-            case Opcodes::SKP_EX9E:
+            case Opcodes::SKP_EX9E->value:
                 if ($this->gamepad?->getPressedKey() === $this->registers[$args['X']]) {
                     $this->pc += 2;
                 }
                 break;
 
-            case Opcodes::SKNP_EXA1:
+            case Opcodes::SKNP_EXA1->value:
                 if ($this->gamepad?->getPressedKey() !== $this->registers[$args['X']]) {
                     $this->pc += 2;
                 }
                 break;
 
-            case Opcodes::LD_FX07:
+            case Opcodes::LD_FX07->value:
                 $this->setRegister($args['X'], $this->deltaTimer);
                 break;
 
-            case Opcodes::LD_FX0A:
+            case Opcodes::LD_FX0A->value:
                 $key = $this->gamepad?->getPressedKey();
 
                 // Halted
@@ -324,23 +329,23 @@ class CPU
                 }
                 break;
 
-            case Opcodes::LD_FX15:
+            case Opcodes::LD_FX15->value:
                 $this->deltaTimer = $this->registers[$args['X']];
                 break;
 
-            case Opcodes::LD_FX18:
+            case Opcodes::LD_FX18->value:
                 $this->soundTimer = $this->registers[$args['X']];
                 break;
 
-            case Opcodes::ADD_FX1E:
+            case Opcodes::ADD_FX1E->value:
                 $this->i += $this->registers[$args['X']];
                 break;
 
-            case Opcodes::LD_FX29:
+            case Opcodes::LD_FX29->value:
                 $this->i = (int) ($this->registers[$args['X']] * 5);
                 break;
 
-            case Opcodes::LD_FX33:
+            case Opcodes::LD_FX33->value:
                 $x = $this->registers[$args['X']];
 
                 $this->memory[$this->i] = (int) floor($x / 100);
@@ -348,14 +353,14 @@ class CPU
                 $this->memory[$this->i + 2] = ($x % 100) % 10;
                 break;
 
-            case Opcodes::LD_FX55:
+            case Opcodes::LD_FX55->value:
                 for ($i = 0; $i <= $args['X']; $i++) {
                     $this->memory[$this->i + $i] = $this->registers[$i];
                 }
                 $this->i += $args['X'] + 1;
                 break;
 
-            case Opcodes::LD_FX65:
+            case Opcodes::LD_FX65->value:
                 for ($i = 0; $i <= $args['X']; $i++) {
                     $this->registers[$i] = $this->memory[$this->i + $i] & 0xff;
                 }

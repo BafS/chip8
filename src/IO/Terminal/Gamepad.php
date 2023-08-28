@@ -8,7 +8,7 @@ final class Gamepad implements GamepadInterface
 {
     private int $lastPressedIndex = 0;
     private ?int $lastPressed = null;
-    private array $keymap;
+    private readonly array $keymap;
 
     public function __construct(private $inputStream, ?array $keymap = null)
     {

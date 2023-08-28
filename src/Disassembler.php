@@ -4,19 +4,20 @@ namespace BafS\Chip8;
 
 class Disassembler
 {
-    private array $opcodeInfo;
+    private readonly array $opcodeInfo;
 
+    /**
+     * @param class-string<\BackedEnum> $opcodeFqcn
+     */
     public function __construct(string $opcodeFqcn = Opcodes::class)
     {
-        $reflectionClass = new \ReflectionClass($opcodeFqcn);
-        $consts = $reflectionClass->getConstants();
-
         $opcodeInfo = [];
-        foreach ($consts as $const => $opcode) {
+        foreach ($opcodeFqcn::cases() as $opcode) {
             $mask = 0;
             $args = [];
+            $opcodeValue = $opcode->value;
             for ($i = 0; $i < 4; ++$i) {
-                $char = $opcode[$i];
+                $char = $opcodeValue[$i];
                 $charMask = (0xF << ((3 - $i) * 4));
                 if (!in_array($char, ['N', 'X', 'Y'], true)) {
                     $mask = $mask | $charMask;
@@ -43,10 +44,10 @@ class Disassembler
                 }
             }
 
-            $opcodeOnly = hexdec(str_replace(['X', 'Y', 'N'], '0', $opcode));
+            $opcodeOnly = hexdec(str_replace(['X', 'Y', 'N'], '0', $opcodeValue));
 
-            $opcodeInfo[$opcode] = [
-                'name' => $const,
+            $opcodeInfo[$opcodeValue] = [
+                'name' => $opcode->name,
                 'opcodeOnly' => $opcodeOnly,
                 'opcodeOnly_DEBUG' => sprintf("%X", $opcodeOnly),
                 'opcode' => $opcode,
@@ -59,6 +60,9 @@ class Disassembler
         $this->opcodeInfo = $opcodeInfo;
     }
 
+    /**
+     * @return array{pattern: string, name: string, args: array<string, int>}|null
+     */
     public function disassemble(int $opcode): ?array
     {
         $bestScore = 0;
