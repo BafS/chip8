@@ -13,14 +13,11 @@ final class Gamepad implements GamepadInterface
     public function __construct(private $inputStream, ?array $keymap = null)
     {
         $this->keymap = array_flip($keymap ?? [
-            '1', '2', '3', '4',
-            'q', 'w', 'e', 'r',
-            'a', 's', 'd', 'f',
-            'z', 'x', 'c', 'v',
+            'x', '1', '2', '3', 'q', 'w', 'e', 'a', 's', 'd', 'z', 'c', '4', 'r', 'f', 'v',
         ]);
     }
 
-    private function getChar(): ?string
+    private function getChar(): string|false
     {
         return fread($this->inputStream, 1);
     }

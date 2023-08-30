@@ -24,8 +24,8 @@ final class Screen implements DisplayInterface, AudioInterface
     {
         $this->color = $options['color'] ?? null;
         $this->cursor = $options['cursor'] ?? new Cursor($this->output);
+        $this->frameBuffer = $options['frame_buffer'] ?? new \SplFixedArray(self::DISPLAY_HEIGHT * self::DISPLAY_WIDTH);
 
-        $this->frameBuffer = new \SplFixedArray(self::DISPLAY_HEIGHT * self::DISPLAY_WIDTH);
         $this->cursor->hide();
         $this->reset();
     }

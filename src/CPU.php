@@ -45,7 +45,7 @@ class CPU
     private int $soundTimer = 0;
     private int $deltaTimer = 0;
     private SplFixedArray $memory;
-    /** Registers (V) */
+    /** @var SplFixedArray<int> Registers (V) */
     private SplFixedArray $registers;
     private SplFixedArray $stack;
     private Disassembler $disassembler;
@@ -272,7 +272,7 @@ class CPU
                 break;
 
             case Opcodes::RND_CXNN->value:
-                $this->setRegister($args['X'],  rand(0, 255) & $args['N']);
+                $this->setRegister($args['X'], rand(0, 255) & $args['N']);
                 break;
 
             case Opcodes::DRW_DXYN->value:
