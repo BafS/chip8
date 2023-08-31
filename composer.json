@@ -6,6 +6,9 @@
             "email": "fabacrans@gmail.com"
         }
     ],
+    "bin": [
+        "bin/chip8"
+    ],
     "require": {
         "php": ">=8.1",
         "symfony/console": "^6.0"

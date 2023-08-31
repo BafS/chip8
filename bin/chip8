@@ -1,6 +1,9 @@
+#!/usr/bin/env php
 <?php
 
 declare(strict_types=1);
+
+namespace BafS\Chip8\Bin;
 
 require './vendor/autoload.php';
 
@@ -110,8 +113,8 @@ final class Chip8Command
     public function run(): int
     {
         return (new SingleCommandApplication())
-            ->addArgument('file', InputArgument::OPTIONAL, 'The rom')
-            ->addOption('frequency', 'f', InputOption::VALUE_REQUIRED)
+            ->addArgument('file', InputArgument::REQUIRED, 'The rom file')
+            ->addOption('frequency', 'f', InputOption::VALUE_REQUIRED, 'Run the emulation with the given frequency')
             ->setCode($this->execute(...))
             ->run();
     }

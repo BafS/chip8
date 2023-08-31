@@ -9,7 +9,7 @@
 ## Run in the terminal
 
 - `composer i`
-- `./bin/app.php <yourgame.ch8>`
+- `./bin/chip8 <yourgame.ch8>`
 
 The default keyboard layout was mapped as follows:
 ```
@@ -24,6 +24,16 @@ A|0|B|F  ->  Z|X|C|V
 ## Tests
 
 - `./vendor/bin/phpunit tests/ --testdox`
+
+## Quality
+
+### Static Analysis
+
+- `./vendor/bin/phpstan analyse src/ -l 7`
+
+### Syntax lint
+
+- `./vendor/bin/phpcs --standard=PSR12 src/`
 
 #### Documentation
 
