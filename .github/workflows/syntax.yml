@@ -1,0 +1,33 @@
+name: Linting (syntax)
+
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main ]
+
+jobs:
+    static-analysis-phpstan:
+        name: Syntax linting
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                php-version:
+                    - 8.1
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Install PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  coverage: none
+                  php-version: ${{ matrix.php-version }}
+
+            - name: Install dependencies with composer
+              run: composer install --no-interaction --no-progress --no-suggest
+
+            - name: Run PHP code sniffer (PSR12)
+              run: ./vendor/bin/phpcs --standard=PSR12 --extensions=php src/
