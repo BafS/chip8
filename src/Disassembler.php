@@ -4,6 +4,7 @@ namespace BafS\Chip8;
 
 class Disassembler
 {
+    /** @var array<string, array{name: string, opcodeOnly: float|int, opcode: string, mask: int, args: array<string, mixed>}> */
     private readonly array $opcodeInfo;
 
     /**
@@ -15,7 +16,7 @@ class Disassembler
         foreach ($opcodeFqcn::cases() as $opcode) {
             $mask = 0;
             $args = [];
-            $opcodeValue = $opcode->value;
+            $opcodeValue = (string) $opcode->value;
             for ($i = 0; $i < 4; ++$i) {
                 $char = $opcodeValue[$i];
                 $charMask = (0xF << ((3 - $i) * 4));
@@ -50,7 +51,7 @@ class Disassembler
                 'name' => $opcode->name,
                 'opcodeOnly' => $opcodeOnly,
                 'opcodeOnly_DEBUG' => sprintf("%X", $opcodeOnly),
-                'opcode' => $opcode,
+                'opcode' => $opcode->value,
                 'mask' => $mask,
                 'mask_DEBUG' => sprintf("%X", $mask),
                 'args' => $args,
@@ -61,9 +62,9 @@ class Disassembler
     }
 
     /**
-     * @return array{pattern: string, name: string, args: array<string, int>}|null
+     * @return array{pattern: string, name: string, args: array<string, mixed>}
      */
-    public function disassemble(int $opcode): ?array
+    public function disassemble(int $opcode): array
     {
         $bestScore = 0;
         $best = null;
@@ -86,11 +87,15 @@ class Disassembler
                 $best = [
                     'pattern' => $name,
                     'name' => $opcodeInfo['name'],
-                    'args' => $args ?? [],
+                    'args' => $args,
                 ];
             }
         }
 
-        return $best ?? null;
+        if ($best === null) {
+             throw new \RuntimeException("Opcode '$opcode' could not be disassembled.");
+        }
+
+        return $best;
     }
 }

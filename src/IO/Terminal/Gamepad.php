@@ -8,10 +8,20 @@ final class Gamepad implements GamepadInterface
 {
     private int $lastPressedIndex = 0;
     private ?int $lastPressed = null;
+    /** @var non-empty-array<string, int> */
     private readonly array $keymap;
 
-    public function __construct(private $inputStream, ?array $keymap = null)
+    /**
+     * @param resource $inputStream
+     * @param non-empty-list<string>|null $keymap
+     */
+    public function __construct(private readonly mixed $inputStream, ?array $keymap = null)
     {
+        if (!is_resource($this->inputStream)) {
+            $actualType = get_debug_type($this->inputStream);
+            throw new \InvalidArgumentException("\$inputStream must be of type resource ($actualType given).");
+        }
+
         $this->keymap = array_flip($keymap ?? [
             'x', '1', '2', '3', 'q', 'w', 'e', 'a', 's', 'd', 'z', 'c', '4', 'r', 'f', 'v',
         ]);

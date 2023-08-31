@@ -18,8 +18,12 @@ final class Screen implements DisplayInterface, AudioInterface
 
     private readonly ?string $color;
     private readonly Cursor $cursor;
+    /** @var \SplFixedArray<0|1> */
     private \SplFixedArray $frameBuffer;
 
+    /**
+     * @param array{color?: string|null, cursor?: Cursor, frame_buffer?: \SplFixedArray<0|1>} $options
+     */
     public function __construct(private readonly OutputInterface $output, array $options = [])
     {
         $this->color = $options['color'] ?? null;
