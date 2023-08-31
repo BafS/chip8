@@ -1,0 +1,36 @@
+name: Static Analysis
+
+on: [push]
+
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main ]
+
+jobs:
+    static-analysis-phpstan:
+        name: Static Analysis (phpstan)
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                php-version:
+                    - 8.1
+                    - 8.2
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Install PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  coverage: none
+                  php-version: ${{ matrix.php-version }}
+
+            - name: Install dependencies with composer
+              run: composer install --no-interaction --no-progress --no-suggest
+
+            - name: Run a static analysis
+              run: ./vendor/bin/phpstan analyse src -l 7
