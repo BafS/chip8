@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 require './vendor/autoload.php';
 
@@ -115,5 +117,5 @@ final class Chip8Command
     }
 }
 
-$ret = (new Chip8Command)->run();
+$ret = (new Chip8Command())->run();
 exit($ret);
