@@ -1,4 +1,4 @@
-name: Static Analysis
+name: "Unit/Integration Tests"
 
 on:
     push:
@@ -8,12 +8,13 @@ on:
 
 jobs:
     static-analysis-phpstan:
-        name: Static Analysis (phpstan)
+        name: PHPUnit Tests
         runs-on: ubuntu-latest
 
         strategy:
             matrix:
                 php-version:
+                    - 8.1
                     - 8.2
 
         steps:
@@ -29,5 +30,5 @@ jobs:
             - name: Install dependencies with composer
               run: composer install --no-interaction --no-progress --no-suggest
 
-            - name: Run a static analysis
-              run: ./vendor/bin/phpstan analyse src -l 7 --no-progress
+            - name: Run PHPUnit
+              run: ./vendor/bin/phpunit --testdox tests
