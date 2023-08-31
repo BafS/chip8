@@ -44,16 +44,22 @@ class CPU
     private int $sp = 0;
     private int $soundTimer = 0;
     private int $deltaTimer = 0;
+    /** @var SplFixedArray<int> */
     private SplFixedArray $memory;
     /** @var SplFixedArray<int> Registers (V) */
     private SplFixedArray $registers;
+    /** @var SplFixedArray<int> */
     private SplFixedArray $stack;
     private Disassembler $disassembler;
-    /** @var \Closure(self, int, array):void|null  */
+    /** @var \Closure(self, int, array<string, mixed>):void|null  */
     private ?\Closure $debugCallback;
+    /** @var array<string, bool> */
     private array $quirks;
     private bool $halted = false;
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function __construct(
         private readonly ?DisplayInterface $screen = null,
         private readonly ?AudioInterface $audio = null,
@@ -113,6 +119,7 @@ class CPU
     {
         $this->screen?->clear();
 
+        /** @phpstan-ignore-next-line */
         while (true) {
             $this->gamepad?->read();
 

@@ -13,9 +13,12 @@ use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\SingleCommandApplication;
 
+/**
+ * @internal
+ */
 final class StringHelper
 {
-    public static function registersToString($registers): string
+    public static function registersToString(\SplFixedArray $registers): string
     {
         return implode(
             ' ',
