@@ -55,12 +55,12 @@ class CPU
     private Disassembler $disassembler;
     /** @var \Closure(self, int, array<string, mixed>):void|null  */
     private ?\Closure $debugCallback;
-    /** @var array<string, bool> */
+    /** @var array<non-empty-string, bool> */
     private array $quirks;
     private bool $halted = false;
 
     /**
-     * @param array<string, mixed> $options
+     * @param array<non-empty-string, mixed> $options
      */
     public function __construct(
         private readonly ?DisplayInterface $screen = null,
@@ -143,7 +143,7 @@ class CPU
         return $this->memory[$this->pc] << 8 | $this->memory[$this->pc + 1];
     }
 
-    public function tick(int $opcode = null): void
+    public function tick(?int $opcode = null): void
     {
         // Fetch opcode
         $opcode = $opcode ?? $this->fetchCurrentOpcode();

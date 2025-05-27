@@ -53,7 +53,7 @@ class Disassembler
                 'name' => $opcode->name,
                 'opcodeOnly' => $opcodeOnly,
                 'opcodeOnly_DEBUG' => sprintf("%X", $opcodeOnly),
-                'opcode' => $opcode->value,
+                'opcode' => $opcodeValue,
                 'mask' => $mask,
                 'mask_DEBUG' => sprintf("%X", $mask),
                 'args' => $args,
