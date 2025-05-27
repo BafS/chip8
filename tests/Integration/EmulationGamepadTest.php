@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Integration;
+namespace Test\Integration;
 
 use BafS\Chip8\CPU;
 use BafS\Chip8\IO\Terminal\Gamepad;
